@@ -54,7 +54,7 @@ def test_telemetry_oob_simple_flush(telemetry_setup):
     assert telemetry.size() == 0
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.repeat(10)
 def test_telemetry_oob_urgent(telemetry_setup):
     """Tests sending an urgent OCSP Exception message."""
     telemetry = TelemetryService.get_instance()
@@ -104,7 +104,7 @@ def test_telemetry_oob_http_log(telemetry_setup):
     assert telemetry.size() == 0
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.repeat(10)
 def test_telemetry_oob_http_log_urgent(telemetry_setup):
     """Tests sending an urgent HTTP request telemetry event."""
     telemetry = TelemetryService.get_instance()

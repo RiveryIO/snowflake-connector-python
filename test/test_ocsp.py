@@ -47,6 +47,8 @@ TARGET_HOSTS = [
 ]
 
 THIS_DIR = path.dirname(path.realpath(__file__))
+# Mark every test in this module as an count test
+pytestmark = pytest.mark.repeat(10)
 
 
 @pytest.fixture(autouse=True)
@@ -227,6 +229,7 @@ def test_ocsp_with_bogus_cache_files(tmpdir):
             'Failed to validate: {}'.format(hostname)
 
 
+@pytest.mark.repeat(1000)
 def test_ocsp_with_outdated_cache(tmpdir):
     """Attempts to use outdated OCSP response cache file."""
     cache_file_name, target_hosts = _store_cache_in_file(tmpdir)
