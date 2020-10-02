@@ -229,7 +229,6 @@ def test_ocsp_with_bogus_cache_files(tmpdir):
             'Failed to validate: {}'.format(hostname)
 
 
-@pytest.mark.repeat(1000)
 def test_ocsp_with_outdated_cache(tmpdir):
     """Attempts to use outdated OCSP response cache file."""
     cache_file_name, target_hosts = _store_cache_in_file(tmpdir)
@@ -346,6 +345,7 @@ def test_ocsp_incomplete_chain():
     assert 'CA certificate is NOT found' in ex.value.msg
 
 
+@pytest.mark.repeat(1000)
 def test_ocsp_cache_merge(tmpdir):
     """Merges two OCSP response cache files."""
     previous_folder = tmpdir.mkdir('previous')
