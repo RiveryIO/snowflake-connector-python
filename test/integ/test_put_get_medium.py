@@ -19,6 +19,8 @@ import pytz
 from snowflake.connector import ProgrammingError
 from snowflake.connector.cursor import DictCursor
 
+from ..generate_test_files import generate_k_lines_of_n_files
+
 try:
     from parameters import (CONNECTION_PARAMETERS_ADMIN)
 except ImportError:
@@ -31,7 +33,7 @@ logger = getLogger(__name__)
 
 def test_put_copy0(conn_cnx, db_parameters):
     """Puts and Copies a file."""
-    data_file = os.path.join(THIS_DIR, "data", "put_get_1.txt")
+    data_file = os.path.join(THIS_DIR, "../data", "put_get_1.txt")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -77,7 +79,7 @@ ratio number(5,2))
 
 def test_put_copy_compressed(conn_cnx, db_parameters):
     """Puts and Copies compressed files."""
-    data_file = os.path.join(THIS_DIR, "data", "gzip_sample.txt.gz")
+    data_file = os.path.join(THIS_DIR, "../data", "gzip_sample.txt.gz")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -108,7 +110,7 @@ def test_put_copy_compressed(conn_cnx, db_parameters):
 )
 def test_put_copy_bz2_compressed(conn_cnx, db_parameters):
     """Put and Copy bz2 compressed files."""
-    data_file = os.path.join(THIS_DIR, "data", "bzip2_sample.txt.bz2")
+    data_file = os.path.join(THIS_DIR, "../data", "bzip2_sample.txt.bz2")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -132,7 +134,7 @@ def test_put_copy_bz2_compressed(conn_cnx, db_parameters):
 
 def test_put_copy_brotli_compressed(conn_cnx, db_parameters):
     """Puts and Copies brotli compressed files."""
-    data_file = os.path.join(THIS_DIR, "data", "brotli_sample.txt.br")
+    data_file = os.path.join(THIS_DIR, "../data", "brotli_sample.txt.br")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -157,7 +159,7 @@ def test_put_copy_brotli_compressed(conn_cnx, db_parameters):
 
 def test_put_copy_zstd_compressed(conn_cnx, db_parameters):
     """Puts and Copies zstd compressed files."""
-    data_file = os.path.join(THIS_DIR, "data", "zstd_sample.txt.zst")
+    data_file = os.path.join(THIS_DIR, "../data", "zstd_sample.txt.zst")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -187,7 +189,7 @@ def test_put_copy_zstd_compressed(conn_cnx, db_parameters):
 def test_put_copy_parquet_compressed(conn_cnx, db_parameters):
     """Puts and Copies parquet compressed files."""
     data_file = os.path.join(
-        THIS_DIR, "data", "nation.impala.parquet")
+        THIS_DIR, "../data", "nation.impala.parquet")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -219,7 +221,7 @@ stage_file_format=(type='parquet')
 
 def test_put_copy_orc_compressed(conn_cnx, db_parameters):
     """Puts and Copies ORC compressed files."""
-    data_file = os.path.join(THIS_DIR, "data", "TestOrcFile.test1.orc")
+    data_file = os.path.join(THIS_DIR, "../data", "TestOrcFile.test1.orc")
 
     def run(cnx, sql):
         sql = sql.format(
@@ -322,12 +324,12 @@ max_file_size=10000000
 
 
 @pytest.mark.repeat(10)
-def test_put_copy_many_files(tmpdir, test_files, conn_cnx, db_parameters):
+def test_put_copy_many_files(tmpdir, conn_cnx, db_parameters):
     """Puts and Copies many_files."""
     # generates N files
     number_of_files = 100
     number_of_lines = 1000
-    tmp_dir = test_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
 
     files = os.path.join(tmp_dir, 'file*')
 
@@ -362,12 +364,12 @@ ratio number(6,2))
 
 
 @pytest.mark.aws
-def test_put_copy_many_files_s3(tmpdir, test_files, conn_cnx, db_parameters):
+def test_put_copy_many_files_s3(tmpdir, conn_cnx, db_parameters):
     """[s3] Puts and Copies many files."""
     # generates N files
     number_of_files = 10
     number_of_lines = 1000
-    tmp_dir = test_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
 
     files = os.path.join(tmp_dir, 'file*')
 
@@ -415,13 +417,13 @@ ratio number(6,2))
 @pytest.mark.aws
 @pytest.mark.azure
 @pytest.mark.repeat(10)
-def test_put_copy_duplicated_files_s3(tmpdir, test_files, conn_cnx,
+def test_put_copy_duplicated_files_s3(tmpdir, conn_cnx,
                                       db_parameters):
     """[s3] Puts and Copies duplicated files."""
     # generates N files
     number_of_files = 5
     number_of_lines = 100
-    tmp_dir = test_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
 
     files = os.path.join(tmp_dir, 'file*')
 
@@ -500,16 +502,16 @@ ratio number(6,2))
 
 @pytest.mark.aws
 @pytest.mark.azure
-def test_put_collision(tmpdir, test_files, conn_cnx, db_parameters):
+def test_put_collision(tmpdir, conn_cnx, db_parameters):
     """File name collision test. The data set have the same file names but contents are different."""
     number_of_files = 5
     number_of_lines = 10
     # data set 1
-    tmp_dir = test_files(number_of_lines, number_of_files, compress=True, tmp_dir=str(tmpdir.mkdir('data1')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, compress=True, tmp_dir=str(tmpdir.mkdir('data1')))
     files1 = os.path.join(tmp_dir, 'file*')
 
     # data set 2
-    tmp_dir = test_files(number_of_lines, number_of_files, compress=True, tmp_dir=str(tmpdir.mkdir('data2')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, compress=True, tmp_dir=str(tmpdir.mkdir('data2')))
     files2 = os.path.join(tmp_dir, 'file*')
 
     stage_name = "test_put_collision/{}".format(db_parameters['name'])
@@ -644,11 +646,11 @@ def _huge_value_json_upload(tmpdir, conn_cnx, db_parameters):
 
 @pytest.mark.aws
 @pytest.mark.repeat(10)
-def test_put_get_large_files_s3(tmpdir, test_files, conn_cnx, db_parameters):
+def test_put_get_large_files_s3(tmpdir, conn_cnx, db_parameters):
     """[s3] Puts and Gets Large files."""
     number_of_files = 3
     number_of_lines = 200000
-    tmp_dir = test_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
+    tmp_dir = generate_k_lines_of_n_files(number_of_lines, number_of_files, tmp_dir=str(tmpdir.mkdir('data')))
 
     files = os.path.join(tmp_dir, 'file*')
     output_dir = os.path.join(tmp_dir, 'output_dir')
@@ -701,7 +703,7 @@ def test_put_get_large_files_s3(tmpdir, test_files, conn_cnx, db_parameters):
 def test_put_get_with_hint(tmpdir, conn_cnx, db_parameters):
     """SNOW-15153: PUTs and GETs with hint."""
     tmp_dir = str(tmpdir.mkdir('put_get_with_hint'))
-    data_file = os.path.join(THIS_DIR, "data", "put_get_1.txt")
+    data_file = os.path.join(THIS_DIR, "../data", "put_get_1.txt")
 
     def run(cnx, sql, _is_put_get=None):
         return cnx.cursor().execute(

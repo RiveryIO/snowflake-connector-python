@@ -10,8 +10,10 @@
 import pathlib
 import subprocess
 
+file_ignore_list = ['run.py', '__init__.py']
+
 for test_file in pathlib.Path(__file__).parent.glob('*.py'):
-    if test_file.name != 'run.py':
+    if test_file.name not in file_ignore_list:
         print("Running {}".format(test_file))
         sub_process = subprocess.run(['python', str(test_file)])
         sub_process.check_returncode()

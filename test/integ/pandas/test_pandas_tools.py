@@ -8,10 +8,12 @@ import math
 from typing import Callable, Dict, Generator
 
 import mock
-import pandas
 import pytest
 
+from snowflake.connector.options import pandas
 from snowflake.connector.pandas_tools import write_pandas
+
+from ...lazy_var import LazyVar
 
 MYPY = False
 if MYPY:  # from typing import TYPE_CHECKING once 3.5 is deprecated
@@ -25,7 +27,8 @@ sf_connector_version_data = [
     ('snowflake-odbc', '3.12.3'),
 ]
 
-sf_connector_version_df = pandas.DataFrame(sf_connector_version_data, columns=['name', 'newest_version'])
+sf_connector_version_df = LazyVar(lambda: pandas.DataFrame(sf_connector_version_data,
+                                                           columns=['name', 'newest_version']))
 
 
 @pytest.mark.parametrize('chunk_size', [5, 4, 3, 2, 1])
@@ -46,7 +49,7 @@ def test_write_pandas(conn_cnx: Callable[..., Generator['SnowflakeConnection', N
         cnx.execute_string('CREATE OR REPLACE TABLE "{}"("name" STRING, "newest_version" STRING)'.format(table_name))
         try:
             success, nchunks, nrows, _ = write_pandas(cnx,
-                                                      sf_connector_version_df,
+                                                      sf_connector_version_df.get(),
                                                       table_name,
                                                       compression=compression,
                                                       parallel=parallel,
@@ -81,7 +84,7 @@ def test_location_building_db_schema(conn_cnx):
             cur._result = iter([])
             return cur
         with mock.patch('snowflake.connector.cursor.SnowflakeCursor.execute', side_effect=mocked_execute) as m_execute:
-            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df, "table",
+            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df.get(), "table",
                                                       database='database', schema='schema')
             assert m_execute.called and any(map(lambda e: 'COPY INTO' in str(e.args), m_execute.call_args_list))
 
@@ -98,7 +101,7 @@ def test_location_building_schema(conn_cnx):
             cur._result = iter([])
             return cur
         with mock.patch('snowflake.connector.cursor.SnowflakeCursor.execute', side_effect=mocked_execute) as m_execute:
-            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df, "table",
+            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df.get(), "table",
                                                       schema='schema')
             assert m_execute.called and any(map(lambda e: 'COPY INTO' in str(e.args), m_execute.call_args_list))
 
@@ -115,5 +118,5 @@ def test_location_building(conn_cnx):
             cur._result = iter([])
             return cur
         with mock.patch('snowflake.connector.cursor.SnowflakeCursor.execute', side_effect=mocked_execute) as m_execute:
-            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df, "teble.table")
+            success, nchunks, nrows, _ = write_pandas(cnx, sf_connector_version_df.get(), "teble.table")
             assert m_execute.called and any(map(lambda e: 'COPY INTO' in str(e.args), m_execute.call_args_list))
