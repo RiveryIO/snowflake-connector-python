@@ -57,6 +57,7 @@ dev_requirements = [
     'mock',
     'pytz',
     'pytzdata',
+    'psutil',
     'Cython',
     'pendulum!=2.1.1',
     'more-itertools',
