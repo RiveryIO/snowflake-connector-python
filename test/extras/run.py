@@ -19,6 +19,8 @@ def print_debug_info() -> None:
     print("Full path: {}".format(sys.path))
     print("Current process information\nPID: {}\nName: {}".format(p.pid, p.name()))
     print("Cmdline: {}".format(' '.join(p.cmdline())))
+    print(subprocess.run(['python', '-m', 'site']).stdout)
+    print(subprocess.run(['python', '-c', 'import sys; print(sys.executable)']).stdout)
 
 
 def run_tests() -> None:
