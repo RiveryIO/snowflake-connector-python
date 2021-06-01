@@ -15,7 +15,7 @@ idna==2.9
 jmespath==0.10.0
 oscrypto==1.2.1
 pycparser==2.20
-pycryptodomex==3.9.8
+pycryptodomex==3.10.1
 PyJWT==1.7.1
 pyOpenSSL==19.1.0
 python-dateutil==2.8.1
