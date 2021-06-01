@@ -64,7 +64,7 @@ setup(
         'pyOpenSSL~=16.2.0,<21.0.0',
         'cffi~=1.9,<1.15',
         'cryptography~=2.5.0,<3.0.0',
-        'pyjwt~=2.0.0',
+        'pyjwt>=2.0,<2.2',
         'idna~=2.11',
         'oscrypto~=2.0.0',
         'asn1crypto~=0.24.0,<2.0.0',
