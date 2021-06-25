@@ -57,7 +57,7 @@ setup(
     python_requires='>=3.5',
 
     install_requires=[
-        'urllib3~=1.20,<1.26.0',
+        'urllib3>=1.20,<2.0',
         'certifi~=2021.0.0',
         'pytz~=2021.0',
         'pycryptodomex~=3.2,!=3.5.0,<4.0.0',
