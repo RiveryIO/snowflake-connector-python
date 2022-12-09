@@ -58,7 +58,7 @@ setup(
 
     install_requires=[
         'urllib3~=1.20,<1.26.0',
-        'certifi~=2021.0.0',
+        'certifi>=2021.0,<2022.13',
         'pytz~=2021.0',
         'pycryptodomex~=3.2,!=3.5.0,<4.0.0',
         'pyOpenSSL~=16.2.0,<21.0.0',
